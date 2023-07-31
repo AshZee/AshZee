@@ -1,3 +1,84 @@
+## Requirements : psutil,scrot,rofi,FuraCode_NerdFont(any),firefox
+## Do chmod +x autostart.sh
+## Enter your username in line 62
+
+## Imports ##
+import os
+import subprocess
+from libqtile import qtile
+from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.command import lazy
+from libqtile import layout, bar, widget, hook
+from libqtile.lazy import lazy
+from libqtile.group import _Group
+from typing import List  # noqa: F401 
+
+## My defaults ##
+mod = "mod4" # It is "alt"{change to mod4 if you want super as mod key}
+browser = "google-chrome-stable"
+myTerminal = "alacritty"
+
+# Minimize all windows (show desktop)
+@lazy.function
+def minimize_all(qtile):
+    for win in qtile.current_group.windows:
+        if hasattr(win, "toggle_minimize"):
+            win.toggle_minimize()
+
+## Key Bindings ##
+keys = [
+    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
+    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
+    Key(["mod1"], "Tab", lazy.layout.next(), desc="Move window focus to other window"),
+    # Move windows between left/right columns or move up/down in current stack.
+    Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([mod, "shift"], "n", lazy.window.toggle_floating(), desc="Toggles floating"),
+    # Grow windows. If current window is on the edge of screen and direction
+    Key([mod, "control"], "i", lazy.layout.grow(), desc="Grow window"),
+    Key([mod, "control"], "o", lazy.layout.shrink(), desc="Shrink window"),
+    Key([mod, "control"], "r", lazy.layout.reset(), desc="Reset"),
+    Key(
+        [mod, "shift"],
+        "Return",
+        lazy.layout.toggle_split(),
+        desc="Toggle between split and unsplit sides of stack",
+    ),
+    Key([mod], "Return", lazy.spawn(myTerminal), desc="Launch terminal"),
+    Key([mod, "control"], "Return", lazy.spawn("kitty"), desc="Launch terminal"),
+    # Toggle between different layouts as defined below
+    Key([mod], "Tab", lazy.screen.toggle_group(), desc="Toggle between layouts"),
+    Key([mod], "quoteleft", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
+    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([mod], "Right", lazy.screen.next_group(), desc="Next group"),
+    Key([mod], "Left", lazy.screen.prev_group(), desc="Previous group"),
+    # Toggle Apps
+    Key([mod], "c", lazy.spawn(browser), desc="Launch_Browser"),
+    Key([mod], "f", lazy.spawn("thunar"), desc="File manager"),
+    Key([mod], "l", lazy.spawn("dm-tool lock"), desc="Lock_Screen"),
+    Key([mod], "s", lazy.spawn("spotify"), desc="Launch spotify"),
+    Key([mod], "space", lazy.spawn("rofi -show drun"), desc="Launch_rofi"),
+    Key([mod], "n", lazy.spawn("notion-app"), desc="Launch Notion"),
+    Key([mod], "v", lazy.spawn("code"), desc="launch vscode"),
+    Key([mod], "m", lazy.spawn("thunderbird"), desc="launch mail client"),
+   Key([mod], "x", lazy.spawn("xkill"), desc="launch xkill to force kill selected window"), 
+    Key([mod], "Print", lazy.spawn("shutter -f -e")),
+    Key([mod], "Period", lazy.spawn("rofimoji")),
+   # Volume
+    Key([], 'XF86AudioMute', lazy.spawn('volume.sh mute')),
+    Key([], 'XF86AudioLowerVolume', lazy.spawn('volume.sh down')),
+    Key([], 'XF86AudioRaiseVolume', lazy.spawn('volume.sh up')),
+    Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause"), desc='Play/Pause Player'),
+    Key([], "XF86AudioNext", lazy.spawn("playerctl next"), desc="Skip to next"),
+    Key([], "XF86AudioPrev", lazy.spawn("playerctl previous"), desc="Skip to previous"),
+    # Brightness
+    Key([], 'XF86MonBrightnessUp', lazy.spawn('brightness.sh up')),
     Key([], 'XF86MonBrightnessDown', lazy.spawn('brightness.sh down')),
     # ScreenShot
     Key([mod], "Super_L", lazy.spawn("scrot /home/ash/Screenshots/%Y-%m-%d-%T-screenshot.png")),
