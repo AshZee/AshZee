@@ -15,7 +15,7 @@ from typing import List  # noqa: F401
 
 ## My defaults ##
 mod = "mod4" # It is "alt"{change to mod4 if you want super as mod key}
-browser = "google-chrome-stable"
+browser = "brave"
 myTerminal = "alacritty"
 
 # Minimize all windows (show desktop)
@@ -65,6 +65,7 @@ keys = [
     Key([mod], "s", lazy.spawn("spotify"), desc="Launch spotify"),
     Key([mod], "space", lazy.spawn("rofi -show drun"), desc="Launch_rofi"),
     Key([mod], "n", lazy.spawn("notion-app"), desc="Launch Notion"),
+    Key([mod], "o", lazy.spawn("obsidian"), desc="Launch Obsidian"),
     Key([mod], "v", lazy.spawn("code"), desc="launch vscode"),
     Key([mod], "m", lazy.spawn("thunderbird"), desc="launch mail client"),
    Key([mod], "x", lazy.spawn("xkill"), desc="launch xkill to force kill selected window"), 
@@ -85,7 +86,7 @@ keys = [
     Key(["control"], "Print", lazy.spawn("flameshot gui")),
     # Shutdown
     Key(["mod1", "control"], "z", lazy.spawn("shutdown now")),
-    Key(["mod1", "control"], "s", lazy.spawn("systemctl suspend")),
+    Key(["mod1", "control"], "s", lazy.spawn("sleep-mute.sh")),
     # Show desktop
     Key([mod], "d", minimize_all()),
 ]
@@ -171,8 +172,8 @@ screens = [
                 fontsize = iconFontSize + 5,
                 padding = padding,
                 mouse_callbacks = {            
-                                   'Button1': minimize_all(),
-                                   'Button2': lazy.spawn("shutdown now"),
+                                   'Button1': lazy.spawn('xinput enable "AT Translated Set 2 keyboard"'),
+                                   'Button2': lazy.spawn('xinput disable "AT Translated Set 2 keyboard"'),
                 }
                 ),
               widget.GroupBox(
@@ -225,7 +226,7 @@ screens = [
               widget.Backlight(
                 background = colors[11],
                 foreground = colors[2],
-                backlight_name = 'amdgpu_bl0',
+                backlight_name = 'amdgpu_bl1',
                 brightness_file = 'brightness',
                 fontsize = letterFontSize 
                 ),
@@ -315,9 +316,9 @@ screens = [
                 full_char = "100%",
                 update_interval = 1,
                 fontsize = letterFontSize,
-                notify_below = 21,
+                notify_below = 20,
                 notification_timeout = 5,
-                low_percentage = 0.2,
+                low_percentage = 0.20,
                 discharge_char = '',
                 charge_char = '󱐋',
                 padding = padding,
@@ -376,16 +377,16 @@ layout_theme = {"border_width": 0,
 ## Layouts ##
 
 layouts = [
-    layout.Floating(**layout_theme),
     layout.MonadTall(**layout_theme),
     layout.Max(**layout_theme),
-    layout.Matrix(**layout_theme),
+    layout.Floating(**layout_theme),
 ]
 
 # Drag floating layouts.
 mouse = [
     Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
     Drag([mod, "control" ], "Button1", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([mod, "control" ], "Button2", lazy.window.move_to_bottom()),
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
