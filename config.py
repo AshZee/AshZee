@@ -72,7 +72,7 @@ keys = [
     Key([mod], "Print", lazy.spawn("shutter -f -e")),
     Key([mod], "Period", lazy.spawn("rofimoji")),
    # Volume
-    Key([], 'XF86AudioMute', lazy.spawn('volume.sh mute')),
+    Key([], 'XF86AudioMUTE', lazy.spawn('volume.sh mute')),
     Key([], 'XF86AudioLowerVolume', lazy.spawn('volume.sh down')),
     Key([], 'XF86AudioRaiseVolume', lazy.spawn('volume.sh up')),
     Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause"), desc='Play/Pause Player'),
@@ -126,14 +126,25 @@ def brightup():
 # Brightness Down
 def brightdown():
   qtile.cmd_spawn('brightnessctl set 5%-')
-
+# Toggle On-Screen Keyboard
+def toggleKb():
+    #showKb = True
+    #if(showKb):
+     #   qtile.cmd_spawn('florence hide')
+    #else:
+     qtile.cmd_spawn('florence show')
 # Fonts #
 
 iconFontSize = 18
 letterFontSize = 16
-spacerFontSize = 40
-padding = 7
-spacerPadding = 10 
+spacerFontSize = 20
+padding = 5
+spacerPadding = 5 
+
+# On-Screen Keyboard#
+
+showKb = False
+
 # Colors ##
 
 colors = [["#ff2738", "#ff2738"],
@@ -208,12 +219,28 @@ screens = [
              #   display_metadata=["xesam:title", "xesam:artist"],
              #   objname="org.mpris.MediaPlayer2.spotify",
              #  ),
+             widget.TextBox(
+                text='󰀂',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                padding = padding,
+                ),
+             widget.Wlan(
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                format ='{essid}',
+                mouse_callbacks = {'Button1': lazy.spawn("toggleNetwork.sh")},
+                padding = padding,
+                update_interval = 5,
+                ),
               widget.TextBox(
                 text=' ',
                 background = colors[11],
                 foreground = colors[8],
                 fontsize = spacerFontSize,
-                padding = spacerPadding,
+                padding = spacerPadding
                 ),
               widget.TextBox(
                 text='',
@@ -269,7 +296,8 @@ screens = [
               widget.Memory(
                 background = colors[11],
                 foreground = colors[2],
-                format = '{MemUsed: .0f}{mm}/{MemTotal: .0f}{mm}',
+                measure_mem = 'G',
+                format = '{MemUsed:.0f}{mm}/{MemTotal:.0f}{mm}',
                 padding = padding,
                 fontsize = letterFontSize,
                 ),
@@ -345,12 +373,66 @@ screens = [
                 fontsize = spacerFontSize,
                 padding = spacerPadding,
                 ),
-             widget.Clock(
-                format='%d-%m-%Y %a %I:%M:%S %p',
+              widget.Clock(
+                #format='%d-%m-%Y %a %I:%M:%S %p',
+                format='%A %D %I:%M %p',
                 foreground = colors[2],
                 background = colors[11],
                 fontsize = letterFontSize,
                 padding = padding,
+                ),
+              widget.Sep(
+                background = colors[11],
+                foreground = colors[8],
+                linewidth = 3,
+                padding = spacerPadding * 3,
+                ),
+              widget.TextBox(
+                text='󰌌',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': toggleKb},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󰝜',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.layout.next()},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󰹑',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.spawn("flameshot gui")},
+                padding = padding*2,
+                ),
+              widget.Image(
+                filename='/home/ash/Pictures/airpod.svg',
+                background = colors[11],
+                margin = 9,
+                mouse_callbacks = {'Button1': lazy.spawn("bluetoothctl connect 38:88:A4:EF:D0:CB")},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󱃌',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.spawn("/bin/toggle2.sh 2> /dev/null")},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󰀻',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")},
+                padding = padding*2,
                 ),
               widget.Spacer(
                 length = 10,
