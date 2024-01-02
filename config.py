@@ -16,7 +16,12 @@ from typing import List  # noqa: F401
 ## My defaults ##
 mod = "mod4" # It is "alt"{change to mod4 if you want super as mod key}
 browser = "brave"
-myTerminal = "alacritty"
+myTerminal = "kitty"
+# Bring to front if a floating window
+def floating_to_front(qtile):
+    w = qtile.current_window
+    if w.floating:
+        w.bring_to_front()
 
 # Minimize all windows (show desktop)
 @lazy.function
@@ -27,11 +32,12 @@ def minimize_all(qtile):
 
 ## Key Bindings ##
 keys = [
-    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "g", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "h", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key(["mod1"], "Tab", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([mod], "comma", lazy.next_screen(), desc="Move through the screen focus"),
+    #Key(["mod1"], "Tab", lazy.function(floating_to_front), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
     Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
@@ -39,6 +45,7 @@ keys = [
     Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
     Key([mod, "shift"], "n", lazy.window.toggle_floating(), desc="Toggles floating"),
     # Grow windows. If current window is on the edge of screen and direction
+    Key([mod, "shift"], "f", lazy.window.toggle_fullscreen()),
     Key([mod, "control"], "i", lazy.layout.grow(), desc="Grow window"),
     Key([mod, "control"], "o", lazy.layout.shrink(), desc="Shrink window"),
     Key([mod, "control"], "r", lazy.layout.reset(), desc="Reset"),
@@ -59,11 +66,13 @@ keys = [
     Key([mod], "Right", lazy.screen.next_group(), desc="Next group"),
     Key([mod], "Left", lazy.screen.prev_group(), desc="Previous group"),
     # Toggle Apps
+    Key([mod, "control"], "s", lazy.spawn("/usr/bin/obsGit.sh")),
     Key([mod], "c", lazy.spawn(browser), desc="Launch_Browser"),
+    Key([mod], "p", lazy.spawn('xournalpp'), desc="Launch xournal++"),
     Key([mod], "f", lazy.spawn("thunar"), desc="File manager"),
-    Key([mod], "l", lazy.spawn("dm-tool lock"), desc="Lock_Screen"),
+    Key([mod], "l", lazy.spawn("dm-tool switch-to-greeter"), desc="Lock_Screen"),
     Key([mod], "s", lazy.spawn("spotify"), desc="Launch spotify"),
-    Key([mod], "space", lazy.spawn("rofi -show drun"), desc="Launch_rofi"),
+    Key([mod], "space", lazy.spawn("/home/ash/.config/rofi/launchers/type-1/launcher.sh"), desc="Launch_rofi"),
     Key([mod], "n", lazy.spawn("notion-app"), desc="Launch Notion"),
     Key([mod], "o", lazy.spawn("obsidian"), desc="Launch Obsidian"),
     Key([mod], "v", lazy.spawn("code"), desc="launch vscode"),
@@ -86,7 +95,7 @@ keys = [
     Key(["control"], "Print", lazy.spawn("flameshot gui")),
     # Shutdown
     Key(["mod1", "control"], "z", lazy.spawn("shutdown now")),
-    Key(["mod1", "control"], "s", lazy.spawn("sleep-mute.sh")),
+    Key(["mod1", "control"], "s", lazy.spawn("systemctl suspend")),
     # Show desktop
     Key([mod], "d", minimize_all()),
 ]
@@ -147,28 +156,262 @@ showKb = False
 
 # Colors ##
 
-colors = [["#ff2738", "#ff2738"],
-          ["#ffffff", "#ffffff"],
-          ["#ffffff", "#ffffff"], # text color
-          ["#ffb480", "#ffb480"],
-          ["#fce43c", "#fce43c"],  
-          ["#42d6a4", "#42d6a4"],
-          ["#08cad1", "#08cad1"],
-          ["#ffb135", "#ffb135"], 
-          #["#ffd65a", "#ffd65a"],
-          ["#76787C", "#76787C"], # separators (|)
-          ["#ff5722", "#ff5722"],
-          ["#000000", "#000000"],
-          ["#000000", "#000000"]]
+colors = [["#ff2738", "#ff2738", "#ff2738"], # red
+          ["#ffffff", "#ffffff", "#ffffff"],
+          ["#ffffff", "#ffffff", "#ffffff"], # text color
+          ["#ffb480", "#ffb480", "#ffb480"], # tan
+          ["#fce43c", "#fce43c", "#fce43c"], # yellow
+          ["#42d6a4", "#42d6a4", "#42d6a4"], # turquoise
+          ["#08cad1", "#08cad1", "#08cad1"], # sky blue
+          ["#ffb135", "#ffb135", "#ffb135"], # yellow-orange
+          ["#76787C", "#76787C", "#76787C"], # separators (|) light-gray
+          ["#ff5722", "#ff5722", "#ff5722"], # red-orange
+          ["#000000", "#000000", "#000000"],
+          ["#00000000", "#00000000", "#00000000"]]
 
 ## Widget Defaults ##
 widget_defaults = dict(
-    background=colors[0]
+    background=colors[11]
 )
 
 extension_defaults = widget_defaults.copy()
 
 screens = [
+    Screen(
+        top=bar.Bar(
+            [
+              widget.Spacer(
+                length = 10,
+                background = colors[11],
+                ),
+              widget.TextBox(
+                text = '󰣇',
+                background = colors[11],
+                foreground = "#76787C",
+                fontsize = iconFontSize + 5,
+                padding = padding,
+                mouse_callbacks = {            
+                                   'Button1': lazy.spawn('xinput enable "AT Translated Set 2 keyboard"'),
+                                   'Button2': lazy.spawn('xinput disable "AT Translated Set 2 keyboard"'),
+                }
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize/2,
+                padding = spacerPadding/2
+                ),
+              widget.GroupBox(
+                fontsize = iconFontSize,
+                margin_x = 5,
+                margin_y = 4,
+                padding_y = 0,
+                padding_x = padding,
+                borderwidth = 4,
+                active = "#76787C",
+                inactive = colors[1],
+                rounded = True,
+                highlight_color = colors[11],
+                highlight_method = "line",
+                this_current_screen_border = colors[8],
+                other_screen_border = colors[8],
+                other_current_screen_border = colors[8],
+                this_screen_border = colors[8],
+                foreground = colors[2],
+                center_aligned = True,
+                disable_drag = True,
+                background = colors[11]
+                ),
+              widget.Spacer(
+                  background = colors[11],
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding
+                ),
+             # widget.TextBox(
+             #   text='',
+             #   background = colors[11],
+             #   foreground = colors[2],
+             #   fontsize = iconFontSize,
+             #   mouse_callbacks = {'Button1': brightup, 'Button3': brightdown},
+             #   padding = padding,
+             #   ),
+             # widget.Backlight(
+             #   background = colors[11],
+             #   foreground = colors[2],
+             #   backlight_name = 'amdgpu_bl1',
+             #   brightness_file = 'brightness',
+             #   fontsize = letterFontSize 
+             #   ),
+             # widget.TextBox(
+             #   text=' ',
+             #   background = colors[11],
+             #   foreground = colors[8],
+             #   fontsize = spacerFontSize,
+             #   padding = spacerPadding
+             #   ),
+             # widget.TextBox(
+             #   text='',
+             #   foreground = colors[2],
+             #   background = colors[11],
+             #   fontsize = iconFontSize,
+             #   padding = padding,  
+             #   ),
+             # widget.PulseVolume(
+             #   background = colors[11],
+             #   foreground = colors[2],
+             #   limit_max_volume = True,
+             #   padding_x = padding,
+             #   fontsize = letterFontSize, 
+             #   ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding,
+                ),
+              widget.TextBox(
+                text='',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                padding = padding,
+                mouse_callbacks = {'Button1': open_htop},
+                ),
+              widget.Memory(
+                background = colors[11],
+                foreground = colors[2],
+                measure_mem = 'G',
+                format = '{MemUsed:.0f}{mm}/{MemTotal:.0f}{mm}',
+                padding = padding,
+                fontsize = letterFontSize,
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding,
+                ),
+              widget.BatteryIcon(
+                background = colors[11],
+                scale = 1.2,
+                theme_path = '/usr/share/icons/kora/panel/24/',
+                mouse_callbacks = {'Button1': lazy.spawn("/bin/toggle2.sh 2> /dev/null")},
+                padding = 0,
+                update_interval = 1
+                ),
+              widget.Battery(
+                background = colors[11],
+                battery = 0,
+                foreground = colors[2],
+                format = '{char}{percent:2.0%}',
+                full_char = "100%",
+                mouse_callbacks = {'Button1': lazy.spawn("/bin/toggle2.sh 2> /dev/null")},
+                update_interval = 1,
+                fontsize = letterFontSize,
+                notify_below = 20,
+                notification_timeout = 5,
+                low_percentage = 0.20,
+                discharge_char = '',
+                charge_char = '󱐋',
+                padding = padding/2,
+                low_foreground = "#FFEE75"
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding,
+                ),
+              widget.CurrentLayout(
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = letterFontSize,
+                max_chars = 20,
+                fmt = "<span text_transform='capitalize' weight=\"bold\">{}</span>",
+                padding = padding,
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding,
+                ),
+              widget.Clock(
+                #format='%d-%m-%Y %a %I:%M:%S %p',
+                format='%D %I:%M %p',
+                foreground = colors[2],
+                background = colors[11],
+                fontsize = letterFontSize,
+                padding = padding,
+                ),
+              widget.Sep(
+                background = colors[11],
+                foreground = colors[8],
+                linewidth = 3,
+                padding = spacerPadding * 0,
+                ),
+              widget.Systray(
+                  background = colors[11],
+                  icon_size = iconFontSize,
+                  padding = 2*padding,
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding/2,
+                ),
+              widget.Sep(
+                background = colors[11],
+                foreground = colors[8],
+                linewidth = 3,
+                padding = spacerPadding * 0,
+                ),
+              widget.TextBox(
+                text='󰌌',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': toggleKb},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󰝜',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.layout.next()},
+                padding = padding*2,
+                ),
+              widget.TextBox(
+                text='󰍺',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                mouse_callbacks = {'Button1': lazy.spawn("/usr/bin/setup-ext-display.sh")},
+                padding = padding*2,
+                ),
+              widget.Spacer(
+                length = 10,
+                background = colors[11],
+                ),
+            ],
+            35,
+            margin = [0,0,0,0],
+            background = "#ff000000",
+        ),
+    ),
     Screen(
         top=bar.Bar(
             [
@@ -200,7 +443,9 @@ screens = [
                 highlight_color = colors[11],
                 highlight_method = "line",
                 this_current_screen_border = colors[8],
-                this_screen_border = colors [0],
+                other_screen_border = colors[8],
+                other_current_screen_border = colors[8],
+                this_screen_border = colors[8],
                 foreground = colors[2],
                 center_aligned = True,
                 disable_drag = True,
@@ -209,53 +454,21 @@ screens = [
               widget.Spacer(
                   background = colors[11],
                 ),
-             #widget.Mpris2(
-             #   foreground=colors[2],
-             #   background=colors[11],
-             #   fontsize = letterFontSize,
-             #   name="spotify",
-             #   stopped_text="Nothing currently playing",
-             #   stop_pause_text="{track}", width=100,
-             #   display_metadata=["xesam:title", "xesam:artist"],
-             #   objname="org.mpris.MediaPlayer2.spotify",
-             #  ),
-             widget.TextBox(
-                text='󰀂',
+              widget.TextBox(
+                text='',
                 background = colors[11],
                 foreground = colors[2],
                 fontsize = iconFontSize,
                 padding = padding,
                 ),
-             widget.Wlan(
+              widget.Wlan(
                 background = colors[11],
                 foreground = colors[2],
                 fontsize = iconFontSize,
                 format ='{essid}',
                 mouse_callbacks = {'Button1': lazy.spawn("toggleNetwork.sh")},
                 padding = padding,
-                update_interval = 5,
-                ),
-              widget.TextBox(
-                text=' ',
-                background = colors[11],
-                foreground = colors[8],
-                fontsize = spacerFontSize,
-                padding = spacerPadding
-                ),
-              widget.TextBox(
-                text='',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': brightup, 'Button3': brightdown},
-                padding = padding,
-                ),
-              widget.Backlight(
-                background = colors[11],
-                foreground = colors[2],
-                backlight_name = 'amdgpu_bl1',
-                brightness_file = 'brightness',
-                fontsize = letterFontSize 
+                update_interval = 1,
                 ),
               widget.TextBox(
                 text=' ',
@@ -308,27 +521,27 @@ screens = [
                 fontsize = spacerFontSize,
                 padding = spacerPadding,
                 ),
-            # widget.TextBox(
-            #   text='↓↑',
-            #   foreground = colors[2],
-            #   background = colors[11],
-            #   fontsize = 12,
-            #   padding = 0,
-            #   mouse_callbacks={'Button3': speedtest}
-            #   ),
-            # widget.Net(
-            #   background = colors[11],
-            #   format = '{down} {up}',
-            #   foreground = colors[2],
-            #   fontsize = 12
-            #   ),  
-            # widget.TextBox(
-            #   text='|',
-            #   background = colors[11],
-            #   foreground = colors[8],
-            #   fontsize = 35,
-            #   padding = 2
-            #   ),
+              widget.TextBox(
+                text='',
+                background = colors[11],
+                foreground = colors[2],
+                fontsize = iconFontSize,
+                padding = padding,
+                ),
+              widget.CPU(
+                background = colors[11],
+                foreground = colors[2],
+                format = '{freq_current}GHz {load_percent}%',
+                padding = padding,
+                fontsize = letterFontSize,
+                ),
+              widget.TextBox(
+                text=' ',
+                background = colors[11],
+                foreground = colors[8],
+                fontsize = spacerFontSize,
+                padding = spacerPadding,
+                ),
               widget.TextBox(
                 text='󰁹',
                 background = colors[11],
@@ -375,78 +588,22 @@ screens = [
                 ),
               widget.Clock(
                 #format='%d-%m-%Y %a %I:%M:%S %p',
-                format='%A %D %I:%M %p',
+                format='%D %I:%M %p',
                 foreground = colors[2],
                 background = colors[11],
                 fontsize = letterFontSize,
                 padding = padding,
                 ),
-              widget.Sep(
-                background = colors[11],
-                foreground = colors[8],
-                linewidth = 3,
-                padding = spacerPadding * 3,
-                ),
-              widget.TextBox(
-                text='󰌌',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': toggleKb},
-                padding = padding*2,
-                ),
-              widget.TextBox(
-                text='󰝜',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': lazy.layout.next()},
-                padding = padding*2,
-                ),
-              widget.TextBox(
-                text='󰹑',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': lazy.spawn("flameshot gui")},
-                padding = padding*2,
-                ),
-              widget.Image(
-                filename='/home/ash/Pictures/airpod.svg',
-                background = colors[11],
-                margin = 9,
-                mouse_callbacks = {'Button1': lazy.spawn("bluetoothctl connect 38:88:A4:EF:D0:CB")},
-                padding = padding*2,
-                ),
-              widget.TextBox(
-                text='󱃌',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': lazy.spawn("/bin/toggle2.sh 2> /dev/null")},
-                padding = padding*2,
-                ),
-              widget.TextBox(
-                text='󰀻',
-                background = colors[11],
-                foreground = colors[2],
-                fontsize = iconFontSize,
-                mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")},
-                padding = padding*2,
-                ),
               widget.Spacer(
                 length = 10,
                 background = colors[11],
                 ),
-            # widget.Spacer(
-             #   length = 6,
-              #  background = colors[11],
-               # ),                
             ],
             35,
             margin = [0,0,0,0],
         ),
     ),
+    
 ]
 
 ## Layout Themes ##
@@ -475,14 +632,23 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: List
 follow_mouse_focus = True
-bring_front_click = False
 cursor_warp = False
 floating_layout = layout.Floating(
+        border_width=0,
+        border_focus="#000000",
+        border_normal="#000000",
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
+        Match(wm_class="discord"),  # gitk
+        Match(wm_class="blueman-manager"),  # gitk
+        Match(wm_class="Mail"),  # gitk
+        Match(wm_class="thunderbird"),  # gitk
+        Match(wm_class="com.vixalien.sticky"),  # gitk
+        Match(wm_class="Thunar"),  # gitk
         Match(wm_class="confirmreset"),  # gitk
         Match(wm_class="makebranch"),  # gitk
+        Match(wm_class="DBeaver"),  # gitk
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
@@ -492,7 +658,7 @@ floating_layout = layout.Floating(
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
-
+bring_front_click = False
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
